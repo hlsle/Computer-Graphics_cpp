@@ -1,0 +1,9 @@
+﻿  실습1.cpp
+C:\Users\user\Desktop\Computer Graphics\실습1\실습1.cpp(11,1): warning C4326: 'main'의 반환 형식이 'int'이어야 하는데 'void'입니다.
+C:\Users\user\Desktop\Computer Graphics\실습1\실습1.cpp(53,54): warning C4244: '인수': 'int'에서 'GLclampf'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\user\Desktop\Computer Graphics\실습1\실습1.cpp(53,42): warning C4244: '인수': 'int'에서 'GLclampf'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\user\Desktop\Computer Graphics\실습1\실습1.cpp(53,31): warning C4244: '인수': 'int'에서 'GLclampf'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\user\Desktop\Computer Graphics\실습1\실습1.cpp(69,46): warning C4244: '인수': 'int'에서 'GLclampf'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\user\Desktop\Computer Graphics\실습1\실습1.cpp(69,34): warning C4244: '인수': 'int'에서 'GLclampf'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\user\Desktop\Computer Graphics\실습1\실습1.cpp(69,22): warning C4244: '인수': 'int'에서 'GLclampf'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  실습1.vcxproj -> C:\Users\user\Desktop\Computer Graphics\Debug\실습1.exe
