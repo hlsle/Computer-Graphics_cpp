@@ -176,24 +176,25 @@ void Mouse(int button, int state, int x, int y) {
 		if (ch_size)
 			s += c * 0.3f;
 		else s += 0.3f;
-
+		
+		//s만큼 Scale 변환
 		switch (cnt % 4) {
-		case 0: //네번째 사각형 생성
+		case 0: //네번째 삼각형 생성
 			triShape[9][0] = ox - 0.1*s; triShape[9][1] = oy - 0.1*s;
 			triShape[10][0] = ox + 0.1*s; triShape[10][1] = oy - 0.1*s;
 			triShape[11][0] = ox; triShape[11][1] = oy + 0.2*s;
 			break;
-		case 1: //첫번째 사각형 생성
+		case 1: //첫번째 삼각형 생성
 			triShape[0][0] = ox - 0.1*s; triShape[0][1] = oy - 0.1*s;
 			triShape[1][0] = ox + 0.1*s; triShape[1][1] = oy - 0.1*s;
 			triShape[2][0] = ox; triShape[2][1] = oy + 0.2*s;
 			break;
-		case 2: //두번째 사각형 생성
+		case 2: //두번째 삼각형 생성
 			triShape[3][0] = ox - 0.1*s; triShape[3][1] = oy - 0.1*s;
 			triShape[4][0] = ox + 0.1*s; triShape[4][1] = oy - 0.1*s;
 			triShape[5][0] = ox; triShape[5][1] = oy + 0.2*s;
 			break;
-		case 3: //세번째 사각형 생성
+		case 3: //세번째 삼각형 생성
 			triShape[6][0] = ox - 0.1*s; triShape[6][1] = oy - 0.1*s;
 			triShape[7][0] = ox + 0.1*s; triShape[7][1] = oy - 0.1*s;
 			triShape[8][0] = ox; triShape[8][1] = oy + 0.2*s;
