@@ -4,11 +4,13 @@
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
 #include <math.h>
+#include <vector>
+#include <algorithm>
 using namespace std;
 GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
-GLchar* vertexsource, * fragmentsource; //--- ¼Ò½ºÄÚµå ÀúÀå º¯¼ö
-GLuint vertexshader, fragmentshader; //--- ¼¼ÀÌ´õ °´Ã¼
+GLchar* vertexsource, * fragmentsource; //--- ì†ŒìŠ¤ì½”ë“œ ì €ì¥ ë³€ìˆ˜
+GLuint vertexshader, fragmentshader; //--- ì„¸ì´ë” ê°ì²´
 GLuint s_program;
 void InitBuffer();
 void InitShader();
@@ -32,15 +34,15 @@ GLfloat colors[4][3] = {
 	{ 0.0, 0.0, 0.0 }
 };
 GLuint vao, vbo[2];
-void main(int argc, char** argv) //--- À©µµ¿ì Ãâ·ÂÇÏ°í Äİ¹éÇÔ¼ö ¼³Á¤
+void main(int argc, char** argv) //--- ìœˆë„ìš° ì¶œë ¥í•˜ê³  ì½œë°±í•¨ìˆ˜ ì„¤ì •
 {
-	//--- À©µµ¿ì »ı¼ºÇÏ±â
+	//--- ìœˆë„ìš° ìƒì„±í•˜ê¸°
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(800, 600);
 	glutCreateWindow("Example11");
-	//--- GLEW ÃÊ±âÈ­ÇÏ±â
+	//--- GLEW ì´ˆê¸°í™”í•˜ê¸°
 	glewExperimental = GL_TRUE;
 	srand((unsigned int)time(NULL));
 	glewInit();
@@ -56,80 +58,80 @@ void main(int argc, char** argv) //--- À©µµ¿ì Ãâ·ÂÇÏ°í Äİ¹éÇÔ¼ö ¼³Á¤
 void make_vertexShader()
 {
 	vertexsource = filetobuf("vertex.glsl");
-	//--- ¹öÅØ½º ¼¼ÀÌ´õ °´Ã¼ ¸¸µé±â
+	//--- ë²„í…ìŠ¤ ì„¸ì´ë” ê°ì²´ ë§Œë“¤ê¸°
 	vertexshader = glCreateShader(GL_VERTEX_SHADER);
-	//--- ¼¼ÀÌ´õ ÄÚµå¸¦ ¼¼ÀÌ´õ °´Ã¼¿¡ ³Ö±â
+	//--- ì„¸ì´ë” ì½”ë“œë¥¼ ì„¸ì´ë” ê°ì²´ì— ë„£ê¸°
 	glShaderSource(vertexshader, 1, (const GLchar**)&vertexsource, 0);
-	//--- ¹öÅØ½º ¼¼ÀÌ´õ ÄÄÆÄÀÏÇÏ±â
+	//--- ë²„í…ìŠ¤ ì„¸ì´ë” ì»´íŒŒì¼í•˜ê¸°
 	glCompileShader(vertexshader);
-	//--- ÄÄÆÄÀÏÀÌ Á¦´ë·Î µÇÁö ¾ÊÀº °æ¿ì: ¿¡·¯ Ã¼Å©
+	//--- ì»´íŒŒì¼ì´ ì œëŒ€ë¡œ ë˜ì§€ ì•Šì€ ê²½ìš°: ì—ëŸ¬ ì²´í¬
 	GLint result;
 	GLchar errorLog[512];
 	glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(vertexshader, 512, NULL, errorLog);
-		cerr << "ERROR: vertex shader ÄÄÆÄÀÏ ½ÇÆĞ\n" << errorLog << endl;
+		cerr << "ERROR: vertex shader ì»´íŒŒì¼ ì‹¤íŒ¨\n" << errorLog << endl;
 		return;
 	}
 }
 void make_fragmentShader()
 {
 	fragmentsource = filetobuf("fragment.glsl");
-	//--- ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ °´Ã¼ ¸¸µé±â
+	//--- í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ê°ì²´ ë§Œë“¤ê¸°
 	fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
-	//--- ¼¼ÀÌ´õ ÄÚµå¸¦ ¼¼ÀÌ´õ °´Ã¼¿¡ ³Ö±â
+	//--- ì„¸ì´ë” ì½”ë“œë¥¼ ì„¸ì´ë” ê°ì²´ì— ë„£ê¸°
 	glShaderSource(fragmentshader, 1, (const GLchar**)&fragmentsource, 0);
-	//--- ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ ÄÄÆÄÀÏ
+	//--- í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ì»´íŒŒì¼
 	glCompileShader(fragmentshader);
-	//--- ÄÄÆÄÀÏÀÌ Á¦´ë·Î µÇÁö ¾ÊÀº °æ¿ì: ÄÄÆÄÀÏ ¿¡·¯ Ã¼Å©
+	//--- ì»´íŒŒì¼ì´ ì œëŒ€ë¡œ ë˜ì§€ ì•Šì€ ê²½ìš°: ì»´íŒŒì¼ ì—ëŸ¬ ì²´í¬
 	GLint result;
 	GLchar errorLog[512];
 	glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &result);
 	if (!result)
 	{
 		glGetShaderInfoLog(fragmentshader, 512, NULL, errorLog);
-		cerr << "ERROR: fragment shader ÄÄÆÄÀÏ ½ÇÆĞ\n" << errorLog << endl;
+		cerr << "ERROR: fragment shader ì»´íŒŒì¼ ì‹¤íŒ¨\n" << errorLog << endl;
 		return;
 	}
 }
 void InitBuffer()
 {
-	glGenVertexArrays(1, &vao); //--- VAO ¸¦ ÁöÁ¤ÇÏ°í ÇÒ´çÇÏ±â
-	glBindVertexArray(vao); //--- VAO¸¦ ¹ÙÀÎµåÇÏ±â
-	glGenBuffers(2, vbo); //--- 2°³ÀÇ VBO¸¦ ÁöÁ¤ÇÏ°í ÇÒ´çÇÏ±â
-	//--- 1¹øÂ° VBO¸¦ È°¼ºÈ­ÇÏ¿© ¹ÙÀÎµåÇÏ°í, ¹öÅØ½º ¼Ó¼º (ÁÂÇ¥°ª)À» ÀúÀå
+	glGenVertexArrays(1, &vao); //--- VAO ë¥¼ ì§€ì •í•˜ê³  í• ë‹¹í•˜ê¸°
+	glBindVertexArray(vao); //--- VAOë¥¼ ë°”ì¸ë“œí•˜ê¸°
+	glGenBuffers(2, vbo); //--- 2ê°œì˜ VBOë¥¼ ì§€ì •í•˜ê³  í• ë‹¹í•˜ê¸°
+	//--- 1ë²ˆì§¸ VBOë¥¼ í™œì„±í™”í•˜ì—¬ ë°”ì¸ë“œí•˜ê³ , ë²„í…ìŠ¤ ì†ì„± (ì¢Œí‘œê°’)ì„ ì €ì¥
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	//--- º¯¼ö diamond ¿¡¼­ ¹öÅØ½º µ¥ÀÌÅÍ °ªÀ» ¹öÆÛ¿¡ º¹»çÇÑ´Ù.
-	//--- triShape ¹è¿­ÀÇ »çÀÌÁî: 9 * float
+	//--- ë³€ìˆ˜ diamond ì—ì„œ ë²„í…ìŠ¤ ë°ì´í„° ê°’ì„ ë²„í¼ì— ë³µì‚¬í•œë‹¤.
+	//--- triShape ë°°ì—´ì˜ ì‚¬ì´ì¦ˆ: 9 * float
 	glBufferData(GL_ARRAY_BUFFER, sizeof(dot), dot, GL_STATIC_DRAW);
-	//--- ÁÂÇ¥°ªÀ» attribute ÀÎµ¦½º 0¹ø¿¡ ¸í½ÃÇÑ´Ù: ¹öÅØ½º ´ç 3* float
+	//--- ì¢Œí‘œê°’ì„ attribute ì¸ë±ìŠ¤ 0ë²ˆì— ëª…ì‹œí•œë‹¤: ë²„í…ìŠ¤ ë‹¹ 3* float
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	//--- attribute ÀÎµ¦½º 0¹øÀ» »ç¿ë°¡´ÉÇÏ°Ô ÇÔ
+	//--- attribute ì¸ë±ìŠ¤ 0ë²ˆì„ ì‚¬ìš©ê°€ëŠ¥í•˜ê²Œ í•¨
 	glEnableVertexAttribArray(0);
-	//--- 2¹øÂ° VBO¸¦ È°¼ºÈ­ ÇÏ¿© ¹ÙÀÎµå ÇÏ°í, ¹öÅØ½º ¼Ó¼º (»ö»ó)À» ÀúÀå
+	//--- 2ë²ˆì§¸ VBOë¥¼ í™œì„±í™” í•˜ì—¬ ë°”ì¸ë“œ í•˜ê³ , ë²„í…ìŠ¤ ì†ì„± (ìƒ‰ìƒ)ì„ ì €ì¥
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	//--- º¯¼ö colors¿¡¼­ ¹öÅØ½º »ö»óÀ» º¹»çÇÑ´Ù.
-	//--- colors ¹è¿­ÀÇ »çÀÌÁî: 9 *float
+	//--- ë³€ìˆ˜ colorsì—ì„œ ë²„í…ìŠ¤ ìƒ‰ìƒì„ ë³µì‚¬í•œë‹¤.
+	//--- colors ë°°ì—´ì˜ ì‚¬ì´ì¦ˆ: 9 *float
 	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-	//--- »ö»ó°ªÀ» attribute ÀÎµ¦½º 1¹ø¿¡ ¸í½ÃÇÑ´Ù: ¹öÅØ½º ´ç 3*float
+	//--- ìƒ‰ìƒê°’ì„ attribute ì¸ë±ìŠ¤ 1ë²ˆì— ëª…ì‹œí•œë‹¤: ë²„í…ìŠ¤ ë‹¹ 3*float
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	//--- attribute ÀÎµ¦½º 1¹øÀ» »ç¿ë °¡´ÉÇÏ°Ô ÇÔ.
+	//--- attribute ì¸ë±ìŠ¤ 1ë²ˆì„ ì‚¬ìš© ê°€ëŠ¥í•˜ê²Œ í•¨.
 	glEnableVertexAttribArray(1);
 }
 void InitShader()
 {
-	make_vertexShader(); //--- ¹öÅØ½º ¼¼ÀÌ´õ ¸¸µé±â
-	make_fragmentShader(); //--- ÇÁ·¡±×¸ÕÆ® ¼¼ÀÌ´õ ¸¸µé±â
+	make_vertexShader(); //--- ë²„í…ìŠ¤ ì„¸ì´ë” ë§Œë“¤ê¸°
+	make_fragmentShader(); //--- í”„ë˜ê·¸ë¨¼íŠ¸ ì„¸ì´ë” ë§Œë“¤ê¸°
 	//-- shader Program
 	s_program = glCreateProgram();
 	glAttachShader(s_program, vertexshader);
 	glAttachShader(s_program, fragmentshader);
 	glLinkProgram(s_program);
-	//--- ¼¼ÀÌ´õ »èÁ¦ÇÏ±â
+	//--- ì„¸ì´ë” ì‚­ì œí•˜ê¸°
 	glDeleteShader(vertexshader);
 	glDeleteShader(fragmentshader);
-	//--- Shader Program »ç¿ëÇÏ±â
+	//--- Shader Program ì‚¬ìš©í•˜ê¸°
 	glUseProgram(s_program);
 }
 void Mouse(int button, int state, int x, int y) {
@@ -145,6 +147,35 @@ void Motion(int x, int y) {
 		float x_mov = ox - x_init;
 		float y_mov = oy - y_init;
 
+		int cnt = 0;
+		float y_min = 0.0, y_max = 0.0;
+		for (int i = 0; i < 4; i++) {
+			if (y_min > dot[i][1])
+				y_min = dot[i][1];
+			if (y_max < dot[i][1])
+				y_max = dot[i][1];
+		}
+		vector<float> v;
+		
+		for (int i = 0; i < 4; i++) {
+			int p = 0;
+			while (p < i && dot[p][0] != dot[i][0]) {
+				p++;
+			}
+			if (p == i) {
+				v.push_back(dot[i][0]);
+			}
+		}
+		sort(v.begin(), v.end());
+		int a = 0;
+		for (int i = 0; i < 4; i++) {
+			int j = (i + 1) % 4;        //ì  Bê°€ ì„ ë¶„ (p[i], p[j])ì˜ yì¢Œí‘œ ì‚¬ì´ì— ìˆìŒ        
+			if ((dot[i][1] > y_init) != (dot[j][1] > y_init)) {
+				float atX = (dot[j][0] - dot[i][0]) * (y_init - dot[i][1]) / (dot[j][1] - dot[i][1]) + dot[i][0];
+				if (x_init < atX)
+					cnt++;
+			}
+		}
 		if (x_init >= dot[0][0] - 0.05f && x_init <= dot[0][0] + 0.05f && 
 			y_init >= dot[0][1] - 0.05f && y_init <= dot[0][1] + 0.05f) {
 			dot[0][0] += x_mov; dot[0][1] += y_mov;
@@ -161,12 +192,12 @@ void Motion(int x, int y) {
 			y_init <= dot[2][1] + 0.05f && y_init >= dot[2][1] - 0.05f) {
 			dot[2][0] += x_mov; dot[2][1] += y_mov;
 		}
-		else {
+		else if(cnt%2>0) {
 			for (int i = 0; i < 4; i++) {
 				dot[i][0] += x_mov; dot[i][1] += y_mov;
 			}
 		}
-		// Ã³À½ x, yÁÂÇ¥ ÃÊ±âÈ­
+		// ì²˜ìŒ x, yì¢Œí‘œ ì´ˆê¸°í™”
 		x_init = ox;
 		y_init = oy;
 	}
@@ -175,21 +206,21 @@ void Motion(int x, int y) {
 GLvoid drawScene()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//--- ·»´õ¸µ ÆÄÀÌÇÁ¶óÀÎ¿¡ ¼¼ÀÌ´õ ºÒ·¯¿À±â
+	//--- ë Œë”ë§ íŒŒì´í”„ë¼ì¸ì— ì„¸ì´ë” ë¶ˆëŸ¬ì˜¤ê¸°
 	InitShader();
 	InitBuffer();
 
 	glUseProgram(s_program);
-	//--- »ç¿ëÇÒ VAO ºÒ·¯¿À±â
+	//--- ì‚¬ìš©í•  VAO ë¶ˆëŸ¬ì˜¤ê¸°
 	glBindVertexArray(vao);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	glutSwapBuffers(); //--- È­¸é¿¡ Ãâ·ÂÇÏ±â
+	glutSwapBuffers(); //--- í™”ë©´ì— ì¶œë ¥í•˜ê¸°
 }
-GLvoid Reshape(int w, int h) //--- Äİ¹é ÇÔ¼ö: ´Ù½Ã ±×¸®±â Äİ¹é ÇÔ¼ö 
+GLvoid Reshape(int w, int h) //--- ì½œë°± í•¨ìˆ˜: ë‹¤ì‹œ ê·¸ë¦¬ê¸° ì½œë°± í•¨ìˆ˜ 
 {
 	glViewport(0, 0, w, h);
 }
-//opengl ÁÂÇ¥·Î º¯È¯
+//opengl ì¢Œí‘œë¡œ ë³€í™˜
 void changeOpenGL(int x, int y, float* ox, float* oy)
 {
 	int w = glutGet(GLUT_WINDOW_WIDTH);
